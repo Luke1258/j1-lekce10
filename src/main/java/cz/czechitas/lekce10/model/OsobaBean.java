@@ -12,8 +12,6 @@ import java.util.Date;
  * JavaBean s údaji o osobě.
  */
 public class OsobaBean implements ObservableBean {
-  //TODO 2 Přidat property „pohlavi“ typu String. Při změně hodnoty informovat posluchače události.
-  //TODO 3 Přidat readonly property „dospely“ typu boolean. Při změně hodnoty informovat posluchače události. Property se bude nastavovat z metody vypoctiVek.
   private final ExtendedPropertyChangeSupport pcs = new ExtendedPropertyChangeSupport(this);
   private String jmeno;
   private String prijmeni;
@@ -24,6 +22,19 @@ public class OsobaBean implements ObservableBean {
   private String kraj;
   private LocalDate datumNarozeni;
   private Integer vek;
+  private String pohlavi;
+
+  private Boolean dospely;
+
+  public Boolean getDospely() {
+    return dospely;
+  }
+
+  protected void setDospely(Boolean dospely) {
+    Boolean oldValue = this.dospely;
+    this.dospely = dospely;
+    pcs.firePropertyChange("dospely", oldValue, dospely);
+  }
 
   public String getJmeno() {
     return jmeno;
@@ -39,6 +50,18 @@ public class OsobaBean implements ObservableBean {
     vypoctiCeleJmeno();
   }
 
+  public String getPohlavi() {
+    return pohlavi;
+  }
+
+  public void setPohlavi(String pohlavi) {
+    if (pohlavi.isBlank()) {
+      pohlavi = null;
+    }
+    String oldValue = this.pohlavi;
+    this.pohlavi = pohlavi;
+    pcs.firePropertyChange("pohlavi", oldValue, pohlavi);
+  }
   public String getPrijmeni() {
     return prijmeni;
   }
@@ -174,8 +197,10 @@ public class OsobaBean implements ObservableBean {
   protected void vypoctiVek() {
     if (datumNarozeni == null) {
       setVek(null);
+      setDospely(null);
     }
     setVek(datumNarozeni.until(LocalDate.now()).getYears());
+    setDospely(vek > 18);
   }
 
   @Override
